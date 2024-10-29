@@ -1,0 +1,11 @@
+packages required:
+npm install express mongoose express-session connect-mongo dotenv connect-flash ejs
+
+Backend and database:
+MongoDB Compass
+connection: localhost:27017
+database name: budget_buddy_db
+collections: transactions, users
+
+PORT: 5001
+http://localhost:5001/

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Dashboard</title>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<style>
+			body {
+				font-family: "Arial", sans-serif;
+				background-color: #f7f9fc;
+				margin: 0;
+				padding: 20px;
+			}
+			h1 {
+				text-align: center;
+				color: #2c3e50;
+				margin-bottom: 20px;
+			}
+			h2 {
+				color: #34495e;
+				border-bottom: 2px solid #3498db;
+				padding-bottom: 10px;
+				margin-bottom: 20px;
+			}
+			ul {
+				list-style-type: none;
+				padding: 0;
+				margin-bottom: 20px;
+			}
+			li {
+				background-color: #ffffff;
+				border: 1px solid #dcdcdc;
+				border-radius: 5px;
+				padding: 15px;
+				margin: 5px 0;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			}
+			form {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin-top: 20px;
+			}
+			input[type="number"],
+			select {
+				padding: 10px;
+				margin-right: 10px;
+				border: 1px solid #3498db;
+				border-radius: 5px;
+				font-size: 16px;
+				width: 150px;
+			}
+			input[type="number"]:focus,
+			select:focus {
+				border-color: #2980b9;
+				outline: none;
+			}
+			button {
+				background-color: #3498db;
+				color: white;
+				padding: 10px 15px;
+				border: none;
+				border-radius: 5px;
+				font-size: 16px;
+				cursor: pointer;
+			}
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: #ffffff;
+				border-radius: 8px;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+				display: flex;
+				flex-direction: row;
+			}
+			.transactions {
+				flex: 2;
+				margin-right: 20px;
+			}
+			.header {
+				display: flex;
+				justify-content: flex-end;
+				margin-bottom: 20px;
+			}
+			.logout {
+				text-decoration: none;
+				color: #e74c3c;
+				font-size: 20px;
+				font-weight: bold;
+				padding: 10px 15px;
+			}
+			.error-message,
+			.success-message {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			.chart-container {
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+			}
+			.chart-box {
+				margin-bottom: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<a href="/user/logout" class="logout">Logout</a>
+			</div>
+			<div class="transactions">
+				<h1>Your Dashboard</h1>
+				<% if (flash.error) { %>
+				<div class="error-message"><%= flash.error %></div>
+				<% } %> <% if (flash.success) { %>
+				<div class="success-message"><%= flash.success %></div>
+				<% } %>
+				<p>
+					<strong
+						>Remaining Balance: ₹<%= transactions.reduce((total, transaction) =>
+						total + (transaction.type === 'income' ? transaction.amount :
+						-transaction.amount), 0).toFixed(2) %></strong
+					>
+				</p>
+				<form action="/transaction/add" method="POST">
+					<input type="number" name="amount" required placeholder="Amount" />
+					<select name="type" required>
+						<option value="">Select Option</option>
+						<option value="income">Income</option>
+						<option value="expense">Expense</option>
+					</select>
+					<select name="category" required>
+						<option value="">Select Option</option>
+						<option value="Salary">Salary</option>
+						<option value="Gifts">Gifts</option>
+						<option value="Groceries">Groceries</option>
+						<option value="Rent">Rent</option>
+						<option value="Utilities">Utilities</option>
+						<option value="Other">Other</option>
+					</select>
+					<button type="submit">Add Transaction</button>
+				</form>
+				<h2>Transactions</h2>
+				<ul>
+					<% transactions.slice().reverse().forEach(transaction => { %>
+					<li>
+						<span
+							><%= transaction.type %>: ₹<%= transaction.amount.toFixed(2) %>
+							(<%= transaction.category %>)</span
+						>
+						<span><%= new Date(transaction.date).toLocaleString() %></span>
+						<form
+							action="/transaction/delete/<%= transaction._id %>"
+							method="POST"
+							style="margin-left: 10px">
+							<button type="submit" style="background-color: #e74c3c">
+								Delete
+							</button>
+						</form>
+					</li>
+					<% }) %>
+				</ul>
+			</div>
+			<div class="chart-container">
+				<div class="chart-box">
+					<canvas id="transactionChart"></canvas>
+				</div>
+				<div class="chart-box">
+					<canvas id="categoryChart"></canvas>
+				</div>
+				<div class="chart-box">
+					<canvas id="expenseBarChart"></canvas>
+				</div>
+				<div class="chart-box">
+					<canvas id="trendLineChart"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const ctxTransaction = document.getElementById('transactionChart').getContext('2d');
+			const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+			const ctxExpenseBar = document.getElementById('expenseBarChart').getContext('2d');
+			const ctxTrendLine = document.getElementById('trendLineChart').getContext('2d');
+			const transactions = <%- JSON.stringify(transactions) %>;
+			const incomeData = transactions.filter(t => t.type === 'income').map(t => t.amount);
+			const expenseData = transactions.filter(t => t.type === 'expense').map(t => t.amount);
+			const labels = transactions.map(t => new Date(t.date).toLocaleDateString());
+
+			const transactionChart = new Chart(ctxTransaction, {
+			    type: 'bar',
+			    data: {
+			        labels: labels,
+			        datasets: [
+			            {
+			                label: 'Income',
+			                data: incomeData,
+			                backgroundColor: 'rgba(76, 175, 80, 0.5)',
+			            },
+			            {
+			                label: 'Expense',
+			                data: expenseData,
+			                backgroundColor: 'rgba(244, 67, 54, 0.5)',
+			            },
+			        ],
+			    },
+			    options: {
+			        responsive: true,
+			        scales: {
+			            y: {
+			                beginAtZero: true,
+			            },
+			        },
+			    },
+			});
+
+			const categories = [...new Set(transactions.filter(t => t.type === 'expense').map(t => t.category))];
+			const categoryExpenses = categories.map(category =>
+			    transactions
+			        .filter(t => t.type === 'expense' && t.category === category)
+			        .reduce((total, t) => total + t.amount, 0)
+			);
+
+			const categoryChart = new Chart(ctxCategory, {
+			    type: 'pie',
+			    data: {
+			        labels: categories,
+			        datasets: [{
+			            label: 'Category-wise Expenses',
+			            data: categoryExpenses,
+			            backgroundColor: [
+			                'rgba(244, 67, 54, 0.5)',
+			                'rgba(76, 175, 80, 0.5)',
+			                'rgba(255, 193, 7, 0.5)',
+			                'rgba(33, 150, 243, 0.5)',
+			                'rgba(156, 39, 176, 0.5)',
+			                'rgba(255, 87, 34, 0.5)',
+			            ],
+			        }],
+			    },
+			    options: {
+			        responsive: true,
+			    },
+			});
+
+			const expenseBarChart = new Chart(ctxExpenseBar, {
+			    type: 'bar',
+			    data: {
+			        labels: categories,
+			        datasets: [{
+			            label: 'Total Expenses',
+			            data: categoryExpenses,
+			            backgroundColor: 'rgba(156, 39, 176, 0.5)',
+			        }],
+			    },
+			    options: {
+			        responsive: true,
+			        scales: {
+			            y: {
+			                beginAtZero: true,
+			            },
+			        },
+			    },
+			});
+
+			const monthlyData = {};
+			transactions.forEach(t => {
+			    const month = new Date(t.date).toLocaleString('default', { month: 'long', year: 'numeric' });
+			    if (!monthlyData[month]) {
+			        monthlyData[month] = 0;
+			    }
+			    monthlyData[month] += t.type === 'income' ? t.amount : -t.amount;
+			});
+
+			const trendLabels = Object.keys(monthlyData);
+			const trendData = Object.values(monthlyData);
+
+			const trendLineChart = new Chart(ctxTrendLine, {
+			    type: 'line',
+			    data: {
+			        labels: trendLabels,
+			        datasets: [{
+			            label: 'Balance Trend',
+			            data: trendData,
+			            borderColor: 'rgba(33, 150, 243, 1)',
+			            backgroundColor: 'rgba(33, 150, 243, 0.5)',
+			            fill: true,
+			        }],
+			    },
+			    options: {
+			        responsive: true,
+			        scales: {
+			            y: {
+			                beginAtZero: true,
+			            },
+			        },
+			    },
+			});
+		</script>
+	</body>
+</html>

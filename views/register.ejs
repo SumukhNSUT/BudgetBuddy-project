@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Register to Budget Buddy</title>
+		<style>
+			body {
+				font-family: "Helvetica Neue", Arial, sans-serif;
+				background-color: #f7f9fc;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+				padding: 20px;
+				color: #333;
+			}
+
+			h1 {
+				color: #333;
+				margin-bottom: 20px;
+				font-size: 36px;
+				text-align: center;
+			}
+
+			form {
+				background-color: white;
+				padding: 40px;
+				border-radius: 12px;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+				width: 100%;
+				max-width: 450px;
+				text-align: center;
+			}
+
+			input[type="text"],
+			input[type="email"],
+			input[type="password"] {
+				width: 100%;
+				padding: 14px;
+				margin: 10px 0;
+				border: 2px solid #3498db;
+				border-radius: 8px;
+				font-size: 16px;
+				outline: none;
+			}
+
+			input[type="text"]:focus,
+			input[type="email"]:focus,
+			input[type="password"]:focus {
+				border: 2px solid #2980b9;
+			}
+
+			button {
+				width: 100%;
+				padding: 14px;
+				background-color: #3498db;
+				color: white;
+				border: none;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 18px;
+			}
+
+			button:hover {
+				background-color: #2980b9;
+			}
+
+			.footer-text {
+				margin-top: 20px;
+				color: #333;
+				font-size: 14px;
+			}
+
+			.footer-text a {
+				color: #3498db;
+				text-decoration: underline;
+			}
+
+			.footer-text a:hover {
+				color: #2980b9;
+			}
+
+			@media (max-width: 480px) {
+				h1 {
+					font-size: 28px;
+				}
+
+				button {
+					font-size: 16px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<h1>Register to Budget Buddy</h1>
+			<form action="/user/register" method="POST">
+				<input type="text" name="username" required placeholder="Username" />
+				<input type="email" name="email" required placeholder="Email" />
+				<input
+					type="password"
+					name="password"
+					required
+					placeholder="Password" />
+				<button type="submit">Register</button>
+			</form>
+			<p class="footer-text">
+				Already have an account? <a href="/login">Login here</a>
+			</p>
+		</div>
+	</body>
+</html>

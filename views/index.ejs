@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>BudgetBuddy</title>
+		<link rel="stylesheet" href="/css/styles.css" />
+		<style>
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				background-color: #f0f4f8;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				color: #333;
+				text-align: center;
+			}
+
+			h1 {
+				font-size: 4rem;
+				margin-bottom: 20px;
+				color: #4a90e2;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+			}
+
+			p {
+				font-size: 1.2rem;
+				margin: 10px 0 30px 0;
+				color: #666;
+				max-width: 600px;
+			}
+
+			.slogan {
+				font-weight: bold;
+				font-size: 1.5rem;
+				color: #4caf50;
+				margin: 15px 0;
+			}
+
+			a {
+				display: inline-block;
+				margin: 10px 20px;
+				padding: 15px 30px;
+				font-size: 1.2rem;
+				text-decoration: none;
+				border-radius: 5px;
+				color: #fff;
+				background-color: #4a90e2;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+
+			a:hover {
+				background-color: #357abd;
+			}
+
+			.button-container {
+				display: flex;
+				gap: 20px;
+			}
+
+			footer {
+				margin-top: 30px;
+				font-size: 0.9rem;
+				color: #999;
+			}
+
+			@media (max-width: 768px) {
+				h1 {
+					font-size: 2.5rem;
+				}
+
+				p {
+					font-size: 1rem;
+				}
+
+				a {
+					padding: 10px 20px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Welcome to BudgetBuddy</h1>
+		<p>
+			Your personal finance assistant to help you manage your expenses, track
+			your spending, and save for your goals.
+		</p>
+		<div class="slogan">"Take Control of Your Finances!"</div>
+		<div class="slogan">"Budget Smart, Live Better!"</div>
+		<div class="button-container">
+			<a href="/login">Login</a>
+			<a href="/register">Register</a>
+		</div>
+		<footer>&copy; 2024 BudgetBuddy. All rights reserved.</footer>
+	</body>
+</html>
